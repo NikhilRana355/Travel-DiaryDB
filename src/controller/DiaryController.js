@@ -5,6 +5,7 @@ const CloudinaryUtil = require("../utils/CloudnaryUtil");
 const DiaryModel = require("../models/DiaryModel");
 const UserModel = require("../models/UserModel");
 const NotificationModel = require("../models/NotificationModel");
+const { default: mongoose } = require("mongoose");
 
 const storage = multer.diskStorage({
   destination: "./uploads",
@@ -69,25 +70,36 @@ const getAllDiary = async (req, res) => {
 
 const getAllDiaryByUserId = async (req, res) => {
   try {
+    const userId = req.params.userId;
+
+    // ✅ Step 1: Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    // ✅ Step 2: Query with population
     const diary = await diaryModel
-      .find({ userId: req.params.userId })
+      .find({ userId })
       .populate("userId", "fullName userName profilePic")
       .populate("countryId", "name")
       .populate("stateId", "name")
-      .populate("cityId", "name"); // ✅ Add these populates
+      .populate("cityId", "name");
 
-    if (diary.length === 0) {
-      res.status(404).json({ message: "No diary found" });
-    } else {
-      res.status(200).json({
-        message: "Diary found succesfully",
-        data: diary,
-      });
+    if (!diary || diary.length === 0) {
+      return res.status(404).json({ message: "No diary found" });
     }
+
+    // ✅ Step 3: Return response
+    res.status(200).json({
+      message: "Diary found successfully",
+      data: diary,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("❌ Error in getAllDiaryByUserId:", err); // helpful log
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
 
 const addDiaryWithFile = async (req, res) => {
   upload(req, res, async (err) => {
