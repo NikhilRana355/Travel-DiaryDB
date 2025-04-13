@@ -11,20 +11,20 @@ const diarySchema = new Schema({
         required:true,
     },
     countryId:{
-        type:Schema.Types.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"country",
         // required:true,
     },
-    country:{
-        type: String,
-        required: true,
-    },
+    // country:{
+    //     type: String,
+    //     required: true,
+    // },
     stateId:{
-        type:Schema.Types.ObjectId,
-        ref:"state",
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"State",
     },
     cityId:{
-        type:Schema.Types.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"City",
     },
     description:{

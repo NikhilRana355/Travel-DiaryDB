@@ -649,8 +649,17 @@ const unfollowUser = async (req, res) => {
     }
 };
 
+const getTotalUsers = async (req, res) => {
+    try {
+      const totalUsers = await UserModel.countDocuments();
+      res.json({ total: totalUsers });
+    } catch (err) {
+      console.error("Error counting users:", err.message);
+      res.status(500).json({ error: err.message });
+    }
+  };
 module.exports = {
-    addUser,
+    addUser,getTotalUsers,
     getAllUsers,
     getUserById,
     deleteUserById,

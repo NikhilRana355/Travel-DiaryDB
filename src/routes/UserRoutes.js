@@ -52,6 +52,23 @@ routes.get("/user/followers/:id", userController.getFollowers);
 
 // routes.put("/user/toggleLike/:id", userController.toggleLike);
 // routes.get("/user/isLiked/:id",  userController.isPostLiked);
- 
+ // routes/userRoutes.js or adminRoutes.js
+
+ routes.get("/users/total", userController.getTotalUsers);
+
+// ❗️ THIS COMES AFTER
+routes.get('/user/id/:id', userController.getUserById);
+
+// routes.get('/all', async (req, res) => {
+//   try {
+//     const users = await User.find(); // make sure User model is imported
+//     res.json(users);
+//   } catch (error) {
+//     console.error("Error fetching all users:", error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
+
+  
 
 module.exports = routes

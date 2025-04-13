@@ -31,40 +31,41 @@ const addDiary = async (req, res) => {
   }
 };
 
-const getAllDiary = async (req, res) => {
-    try {
-        const diaries = await diaryModel.find().populate("userId", "fullName  userName  profilePic"); // Ensure userId & name are included
-        console.log("📢 Sending Diaries:", diaries); // Debugging step 4
-        res.status(200).json({
-            message: "All Diaries fetched successfully",
-            data: diaries
-        });
-    } catch (err) {
-        console.error("🚨 Error in getAllDiary:", err);
-        res.status(500).json({
-            message: err.message
-        });
-    }
-};
-
 // const getAllDiary = async (req, res) => {
-//   try {
-//     const diaries = await diaryModel.find()
-//       .populate("userId", "fullName userName profilePic")
-//       .populate("countryId", "name")
-//       .populate("stateId", "name")
-//       .populate("CityId", "name");
-
-//     res.status(200).json({
-//       message: "All Diaries fetched successfully",
-//       data: diaries,
-//     });
-//   } catch (err) {
-//     res.status(500).json({
-//       message: err.message
-//     });
-//   }
+//     try {
+//         const diaries = await diaryModel.find().populate("userId", "fullName  userName  profilePic"); // Ensure userId & name are included
+//         console.log("📢 Sending Diaries:", diaries); // Debugging step 4
+//         res.status(200).json({
+//             message: "All Diaries fetched successfully",
+//             data: diaries
+//         });
+//     } catch (err) {
+//         console.error("🚨 Error in getAllDiary:", err);
+//         res.status(500).json({
+//             message: err.message
+//         });
+//     }
 // };
+
+const getAllDiary = async (req, res) => {
+  try {
+    const diaries = await diaryModel.find()
+      .populate("userId", "fullName userName profilePic")
+      .populate("countryId", "name")
+      .populate("stateId", "name")
+      .populate("cityId", "name")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      message: "All Diaries fetched successfully",
+      data: diaries,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message
+    });
+  }
+};
 
 const getAllDiaryByUserId = async (req, res) => {
   try {
@@ -140,7 +141,7 @@ const getDiaryById = async (req, res) => {
       });
     }
   } catch (err) {
-    res.satus(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 }
 
@@ -205,16 +206,50 @@ const commentPost = async (req, res) => {
     await diary.save();
 
     // Send notification to the post owner
-    await createNotification({
-      senderId: commenterId,
-      receiverId: diary.user._id.toString(),
+    // await createNotification({
+    //   senderId: commenterId,
+    //   receiverId: diary.user._id.toString(),
+    //   message: `${commenter.fullName} commented on your post`,
+    //   type: "comment",
+    // });
+
+    const newNotification = new NotificationModel({
+      recipient: diary.user._id,
+      sender: commenterId,
       message: `${commenter.fullName} commented on your post`,
       type: "comment",
     });
+    await newNotification.save();
+    
 
     res.status(200).json({ message: "Comment added and notification sent" });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+const createDiary = async (req, res) => {
+  try {
+    const newDiary = new Diary({
+      userId: "67d6a35ab8c858b01e422ae1", // this should come from auth middleware
+      title: req.body.title,
+      description: req.body.description,
+      startDate: req.body.startDate,
+      endDate: req.body.endDate,
+      imageURL: req.body.imageURL,
+      countryId: req.body.countryId,  // 🔥 ObjectId from frontend
+      stateId: req.body.stateId,
+      cityId: req.body.cityId,
+    });
+
+    const saved = await newDiary.save();
+
+    res.status(201).json({
+      message: "Diary created successfully",
+      data: saved,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -224,6 +259,6 @@ module.exports = {
   getAllDiaryByUserId,
   addDiaryWithFile,
   updateDiary,
-  getDiaryById,
+  getDiaryById,createDiary,
   likePost, commentPost,
 }
