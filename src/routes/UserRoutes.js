@@ -59,15 +59,8 @@ routes.get("/user/followers/:id", userController.getFollowers);
 // ❗️ THIS COMES AFTER
 routes.get('/user/id/:id', userController.getUserById);
 
-// routes.get('/all', async (req, res) => {
-//   try {
-//     const users = await User.find(); // make sure User model is imported
-//     res.json(users);
-//   } catch (error) {
-//     console.error("Error fetching all users:", error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-//   }
-// });
+routes.put("/user/soft-delete/:id", userController.softDeleteUser);
+
 
   
 

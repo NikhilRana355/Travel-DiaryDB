@@ -28,7 +28,19 @@ const getItineraries = async(req,res) => {
 
     }
 }
+
+// ✅ GET /itin/user/:userId
+const getUserItineraries = async (req, res) => {
+    try {
+      const itineraries = await ItinerariesModel.find({ userId: req.params.userId });
+      res.status(200).json(itineraries);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  };
+  
 module.exports = {
     addItineraries,
     getItineraries,
+    getUserItineraries,
 }

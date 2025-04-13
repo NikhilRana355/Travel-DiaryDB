@@ -49,12 +49,16 @@ const userSchema = new Schema({
     }],
      posts: [{ 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: "Post" 
+        ref: "diary" 
     }],
     likes: [{ 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'users' 
-    }]
+    }],
+    isActive:{
+        type: Boolean,
+        default: true
+    }
 })
 
 module.exports = mongoose.model("users",userSchema)

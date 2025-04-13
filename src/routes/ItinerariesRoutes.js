@@ -14,5 +14,7 @@ routes.get('/itinerary/total', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+routes.get("/user/:userId",itinerariesController.getUserItineraries)
   
 module.exports= routes;

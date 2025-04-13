@@ -10,6 +10,9 @@ routes.get("/getDiaryById",diaryController.getDiaryById);
 routes.post("/likePost",diaryController.likePost)
 routes.post("/create", diaryController.createDiary);
 
+routes.get("/user/:userId", diaryController.getUserDiaries);
+
+
 routes.get('/diary/total', async (req, res) => {
   try {
     const totalDiaries = await DiaryModel.countDocuments();
@@ -29,6 +32,20 @@ routes.get('/alldiaries', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+routes.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await DiaryModel.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Diary not found" });
+    }
+    res.status(200).json({ message: "Diary deleted successfully" });
+  } catch (error) {
+    console.error("Delete error:", error.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 
 
 module.exports = routes;

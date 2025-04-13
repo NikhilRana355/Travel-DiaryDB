@@ -82,13 +82,53 @@ const addUser = async (req, res) => {
         data: savedUser,
     });
 };
+// const getAllUsers = async (req, res) => {
+//     const users = await userModel.find().populate("roleId");
+//     res.json({
+//         message:"User fetched successfully..",
+//         data: users,
+//     });
+// };
+
+// const getAllUsers = async (req, res) => {
+//     try {
+//       // Include both users where isActive is true or undefined (fallback)
+//       const users = await userModel.find({
+//         $or: [{ isActive: true }, { isActive: { $exists: false } }],
+//       }).populate("roleId ");
+  
+//       res.json({
+//         message: "Users fetched successfully",
+//         data: users,
+//       });
+//     } catch (error) {
+//       console.error("getAllUsers error:", error.message);
+//       res.status(500).json({ message: "Internal server error" });
+//     }
+//   };
+
 const getAllUsers = async (req, res) => {
-    const users = await userModel.find().populate("roleId");
-    res.json({
-        message:"User fetched successfully..",
+    try {
+      const adminRoleId = new mongoose.Types.ObjectId("67d0211330fc0b0b8a748d21");
+  
+      const users = await userModel.find({
+        $or: [{ isActive: true }, { isActive: { $exists: false } }],
+        roleId: { $ne: adminRoleId },
+      });
+  
+      console.log("Filtered users (should exclude admin):", users.map(u => u.userName)); // DEBUG
+  
+      res.json({
+        message: "Users fetched successfully",
         data: users,
-    });
-};
+      });
+    } catch (error) {
+      console.error("getAllUsers error:", error.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+  
+  
 
 // const getUserById = async (req, res) => {
 //     const foundUser = await userModel.findById(req.params.id);
@@ -658,9 +698,31 @@ const getTotalUsers = async (req, res) => {
       res.status(500).json({ error: err.message });
     }
   };
+
+const softDeleteUser = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      const updatedUser = await userModel.findByIdAndUpdate(
+        id,
+        { isActive: false },
+        { new: true }
+      );
+  
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      res.json({ message: "User deactivated", data: updatedUser });
+    } catch (error) {
+      console.error("Soft delete error:", error.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+  
 module.exports = {
     addUser,getTotalUsers,
-    getAllUsers,
+    getAllUsers,softDeleteUser,
     getUserById,
     deleteUserById,
     signup,
