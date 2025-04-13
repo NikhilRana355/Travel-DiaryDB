@@ -70,7 +70,12 @@ const getAllDiary = async (req, res) => {
 const getAllDiaryByUserId = async (req, res) => {
   try {
     const diary = await diaryModel
-      .find({ userId: req.params.userId }).populate("userId");
+      .find({ userId: req.params.userId })
+      .populate("userId", "fullName userName profilePic")
+      .populate("countryId", "name")
+      .populate("stateId", "name")
+      .populate("cityId", "name"); // ✅ Add these populates
+
     if (diary.length === 0) {
       res.status(404).json({ message: "No diary found" });
     } else {

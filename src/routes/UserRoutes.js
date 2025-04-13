@@ -61,7 +61,6 @@ routes.get('/user/id/:id', userController.getUserById);
 
 routes.put("/user/soft-delete/:id", userController.softDeleteUser);
 
-
+routes.put("/user/reactivate/:id", userController.reactivateUser);
   
-
 module.exports = routes

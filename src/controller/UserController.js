@@ -32,6 +32,13 @@ const loginUser = async (req,res) => {
     console.log(foundUserfromEmail); 
 
     if (foundUserfromEmail != null ) {
+
+        if (foundUserfromEmail.isActive === false) {
+            return res.status(403).json({
+              message: "Your account is deactivated. Please request admin to reactivate it.",
+            });
+          }
+
         const isMatch = bcrypt.compareSync(password, foundUserfromEmail.password);
 
         if (isMatch == true) {
@@ -111,10 +118,13 @@ const getAllUsers = async (req, res) => {
     try {
       const adminRoleId = new mongoose.Types.ObjectId("67d0211330fc0b0b8a748d21");
   
-      const users = await userModel.find({
-        $or: [{ isActive: true }, { isActive: { $exists: false } }],
+    //   const users = await userModel.find({
+    //     $or: [{ isActive: true }, { isActive: { $exists: false } }],
+    //     roleId: { $ne: adminRoleId },
+    //   });
+        const users = await userModel.find({
         roleId: { $ne: adminRoleId },
-      });
+      });      
   
       console.log("Filtered users (should exclude admin):", users.map(u => u.userName)); // DEBUG
   
@@ -126,9 +136,7 @@ const getAllUsers = async (req, res) => {
       console.error("getAllUsers error:", error.message);
       res.status(500).json({ message: "Internal server error" });
     }
-  };
-  
-  
+  }; 
 
 // const getUserById = async (req, res) => {
 //     const foundUser = await userModel.findById(req.params.id);
@@ -719,13 +727,35 @@ const softDeleteUser = async (req, res) => {
       res.status(500).json({ message: "Internal server error" });
     }
   };
+
+  const reactivateUser = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        id,
+        { isActive: true },
+        { new: true }
+      );
+  
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      res.json({ message: "User reactivated", data: updatedUser });
+    } catch (error) {
+      console.error("Reactivate error:", error.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
+  
   
 module.exports = {
     addUser,getTotalUsers,
     getAllUsers,softDeleteUser,
     getUserById,
     deleteUserById,
-    signup,
+    signup,reactivateUser,
     loginUser,
     updateUserProfile,
     forgotPassword,
