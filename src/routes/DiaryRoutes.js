@@ -46,6 +46,6 @@ routes.delete('/:id', async (req, res) => {
   }
 });
 
-
+routes.delete("/deleteDiary/:id", diaryController.deleteDiary);
 
 module.exports = routes;

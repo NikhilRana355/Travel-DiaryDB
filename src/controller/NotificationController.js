@@ -101,12 +101,7 @@ const deleteNotifications = async (req, res) => {
     }
 };
 
-
-  
-
-
-
 module.exports = {
     createNotification, sendNotification,
     getNotifications, deleteNotifications
-}
+} 

@@ -73,8 +73,7 @@ routes.get('/unread/count/:userId', async (req, res) => {
     } catch (error) {
       res.status(500).json({ message: "Failed to mark as read" });
     }
-  });
-  
+  }); 
 
 routes.post('/send', async (req, res) => {
     const { receiverId, senderId, message, type } = req.body;
@@ -82,7 +81,6 @@ routes.post('/send', async (req, res) => {
     if (!receiverId || !senderId || !message || !type) {
         return res.status(400).json({ error: "Missing fields" });
     }
-
     try {
         const newNotification = new NotificationModel({
             recipient: receiverId,
@@ -90,7 +88,7 @@ routes.post('/send', async (req, res) => {
             message: message,
             type,
              // This will now support "Followed you back!"
-        });
+        });  
 
         await newNotification.save();
 
@@ -101,16 +99,14 @@ routes.post('/send', async (req, res) => {
     }
 });
 
-  
-
-// routes.delete("/delete", async (req, res) => {
+// routes.delete("/delete", async (req, res) => { 
 //     try {
 //       const { notificationIds } = req.body;
   
 //       if (!notificationIds || !Array.isArray(notificationIds)) {
 //         return res.status(400).json({ error: "Invalid request" });
 //       }
-  
+   
 //       await Notification.deleteMany({ _id: { $in: notificationIds } });
   
 //       res.status(200).json({ message: "Notifications deleted successfully" });

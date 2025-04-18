@@ -280,9 +280,25 @@ const getUserDiaries = async (req, res) => {
   }
 };
 
+const deleteDiary = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deleted = await DiaryModel.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Diary not found" });
+    }
+
+    res.status(200).json({ success: true, message: "Diary deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting diary:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 
 module.exports = {
-  addDiary,
+  addDiary,deleteDiary,
   getAllDiary,
   getAllDiaryByUserId,
   addDiaryWithFile,
